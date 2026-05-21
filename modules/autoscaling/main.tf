@@ -14,17 +14,24 @@ data "cloudinit_config" "config" {
 
 data "aws_ami" "ubuntu" {
   most_recent = true
+
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
   owners = ["099720109477"]
 }
 
 resource "aws_launch_template" "webserver" {
   name_prefix   = var.namespace
   image_id      = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
+  instance_type = "t3.micro"
   user_data     = data.cloudinit_config.config.rendered
   key_name      = var.ssh_keypair
   iam_instance_profile {
